@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "shortener"
+name = "shortener-test"
 version = "0.1.0"
 description = "URL shortening service"
 authors = ["Andrew Svetlov <andrew.svetlov@gmail.com>"]

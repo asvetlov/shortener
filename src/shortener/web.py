@@ -41,6 +41,8 @@ async def index(request: web.Request) -> dict[str, Any]:
             "caption": f"/{added_short}",
             "url": request.query["added_url"],
         }
+    else:
+        added = None
     latest = await _read_latest()
     return {"added": added, "latest": latest}
 
@@ -52,12 +54,18 @@ async def create(request: web.Request) -> web.Response:
     assert isinstance(url, str)
     short = await DB.get().register(URL(url))
     new_url = URL.build(path="/", query={"added_short": short, "added_url": url})
+    logger.info("web.created", short=short, url=url)
     raise web.HTTPSeeOther(location=new_url)
 
 
 @ROUTES.get("/{short}")
 async def redirect(request: web.Request) -> web.Response:
-    pass
+    short = request.match_info["short"]
+    url = await DB.get().redirect(short)
+    if url is None:
+        url = URL.build(path="/")
+    logger.info("web.redirect", short=short, url=url)
+    raise web.HTTPSeeOther(location=url)
 
 
 def init(config: Config) -> web.Application:
