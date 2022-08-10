@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>URL Shortener demo</title>
+</head>
+<body>
+
+  <h1>URL Shortener</h1>
+  {% if added %}
+    <div>Short url
+      <a href="{{ added.href }}">{{ added.caption }}</a>
+      ->
+      <a href="{{ added.url }}">{{ added.url }}</a>
+      registered.
+    </div>
+  {% endif %}
+  <form>
+    <label for="url">URL to short:</label>
+    <input type="text" id="url" name="url">
+    <input type="submit" value="Register">
+  </form>
+  <hr>
+  <h2>Latest added short urls</h2>
+  <ul>
+  {% for item in latest %}
+    <li><a href="{{ item.href }}">{{ item.caption }}</a></li>
+  {% endfor %}
+  </ul>
+</body>
+</html>
