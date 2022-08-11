@@ -2,7 +2,7 @@ from typing import AsyncIterator
 
 import pytest
 import pytest_asyncio
-import redis
+from redis.asyncio import from_url
 from yarl import URL
 
 from shortener.db import Database, Record
@@ -10,8 +10,8 @@ from shortener.db import Database, Record
 
 @pytest_asyncio.fixture
 async def db(redis_url: str) -> AsyncIterator[Database]:
-    client = redis.from_url(redis_url)
-    client.flushdb()
+    client = from_url(redis_url)
+    await client.flushdb()
     ret = Database(redis_url)
     yield ret
     await ret.close()

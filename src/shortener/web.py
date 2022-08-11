@@ -1,11 +1,11 @@
 import contextvars
-from typing import Any, TypedDict
+from typing import Any, AsyncIterator, TypedDict
 
 import jinja2
 import structlog
 from aiohttp import web
+from aiohttp_jinja2 import render_template
 from aiohttp_jinja2 import setup as setup_jinja
-from aiohttp_jinja2 import template
 from yarl import URL
 
 from .config import Config
@@ -32,8 +32,7 @@ async def _read_latest() -> list[_LatestItem]:
 
 
 @ROUTES.get("/")
-@template("index.jinja2")
-async def index(request: web.Request) -> dict[str, Any]:
+async def index(request: web.Request) -> web.Response:
     added_short = request.query.get("added_short")
     if added_short:
         added = {
@@ -44,7 +43,11 @@ async def index(request: web.Request) -> dict[str, Any]:
     else:
         added = None
     latest = await _read_latest()
-    return {"added": added, "latest": latest}
+    dct = {"added": added, "latest": latest}
+    if "application/json" in request.headers["Accept"]:
+        return web.json_response(dct)
+    else:
+        return render_template("index.jinja2", request, dct)
 
 
 @ROUTES.post("/")
@@ -68,17 +71,23 @@ async def redirect(request: web.Request) -> web.Response:
     raise web.HTTPSeeOther(location=url)
 
 
-def init(config: Config) -> web.Application:
+async def init(config: Config) -> web.Application:
     app = web.Application()
     setup_jinja(app, loader=jinja2.PackageLoader(__package__, "templates"))
     app.add_routes(ROUTES)
-    db = Database(config.redis_url)
-    DB.set(db)
+
+    async def setup_db(app: web.Application) -> AsyncIterator[None]:
+        db = Database(config.redis_url)
+        DB.set(db)
+        app["db"] = db
+        yield
+        await db.close()
+
+    app.cleanup_ctx.append(setup_db)
     return app
 
 
 def main() -> None:
     config = Config()
-    app = init(config)
     logger.info("web.serve", port=config.http_port)
-    web.run_app(app, port=config.http_port)
+    web.run_app(init(config), port=config.http_port)
