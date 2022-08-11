@@ -9,11 +9,11 @@ from aiohttp_jinja2 import template
 from yarl import URL
 
 from .config import Config
-from .db import AbstractDB, create_db
+from .db import Database
 
 logger = structlog.get_logger()
 
-DB: contextvars.ContextVar[AbstractDB] = contextvars.ContextVar("DB")
+DB: contextvars.ContextVar[Database] = contextvars.ContextVar("DB")
 
 
 ROUTES = web.RouteTableDef()
@@ -72,7 +72,7 @@ def init(config: Config) -> web.Application:
     app = web.Application()
     setup_jinja(app, loader=jinja2.PackageLoader(__package__, "templates"))
     app.add_routes(ROUTES)
-    db = create_db(config.redis_url)
+    db = Database(config.redis_url)
     DB.set(db)
     return app
 
