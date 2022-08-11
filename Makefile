@@ -1,11 +1,11 @@
 setup:
 	pip install -U pip poetry
 	poetry install
-	pre-commit install
+	python -m pre_commit install
 
 lint:
-	pre-commit run --all-files
-	mypy . --strict --show-error-codes
+	python -m pre_commit run --all-files
+	python -m mypy . --strict --show-error-codes
 
 
 build:
@@ -17,7 +17,7 @@ run: build
 
 
 test:
-	pytest tests
+	python -m pytest tests
 
 vtest:
-	pytest -vvv tests
+	python -m pytest -vvv tests
