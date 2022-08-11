@@ -1,6 +1,6 @@
 setup:
-	pip install -U pip
-	poetry update
+	pip install -U pip poetry
+	poetry install
 	pre-commit install
 
 lint:
