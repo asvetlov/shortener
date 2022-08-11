@@ -27,7 +27,7 @@ def json_default(obj: Any) -> Any:
     if is_dataclass(obj):
         return asdict(obj)
     elif isinstance(obj, MappingView):  # e.g. dict_values
-        return list(obj)
+        return list(obj)  # type: ignore[call-overload]
     elif isinstance(obj, URL):
         return str(obj)
     else:
