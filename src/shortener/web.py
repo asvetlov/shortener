@@ -1,5 +1,9 @@
 import contextvars
-from typing import Any, AsyncIterator, TypedDict
+import json
+from collections.abc import MappingView
+from dataclasses import asdict, is_dataclass
+from functools import partial
+from typing import Any, AsyncIterator
 
 import jinja2
 import structlog
@@ -19,16 +23,15 @@ DB: contextvars.ContextVar[Database] = contextvars.ContextVar("DB")
 ROUTES = web.RouteTableDef()
 
 
-class _LatestItem(TypedDict):
-    href: str
-    caption: str
-
-
-async def _read_latest() -> list[_LatestItem]:
-    latest = []
-    for short in await DB.get().latest():
-        latest.append(_LatestItem(href=f"/{short}", caption=short))
-    return latest
+def json_default(obj: Any) -> Any:
+    if is_dataclass(obj):
+        return asdict(obj)
+    elif isinstance(obj, MappingView):  # e.g. dict_values
+        return list(obj)
+    elif isinstance(obj, URL):
+        return str(obj)
+    else:
+        raise TypeError(type(obj))
 
 
 @ROUTES.get("/")
@@ -42,10 +45,10 @@ async def index(request: web.Request) -> web.Response:
         }
     else:
         added = None
-    latest = await _read_latest()
-    dct = {"added": added, "latest": latest}
+    latest = await DB.get().latest()
+    dct = {"added": added, "latest": latest.values()}
     if "application/json" in request.headers["Accept"]:
-        return web.json_response(dct)
+        return web.json_response(dct, dumps=partial(json.dumps, default=json_default))
     else:
         return render_template("index.jinja2", request, dct)
 
@@ -66,7 +69,7 @@ async def redirect(request: web.Request) -> web.Response:
     short = request.match_info["short"]
     url = await DB.get().redirect(short)
     if url is None:
-        url = URL.build(path="/")
+        raise web.HTTPNotFound()
     logger.info("web.redirect", short=short, url=url)
     raise web.HTTPSeeOther(location=url)
 
