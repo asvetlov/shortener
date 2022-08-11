@@ -1,19 +1,23 @@
 import socket
 import time
+from typing import AsyncIterator, Callable, Iterator
 
-import docker
+import docker  # type: ignore
 import pytest
 import pytest_asyncio
 import redis
+import redis.asyncio
 
 
 @pytest.fixture(scope="session")
-def docker_client():
+def docker_client() -> docker.DockerClient:
     return docker.from_env()
 
 
 @pytest.fixture(scope="session")
-def redis_url(docker_client, unused_tcp_port_factory):
+def redis_url(
+    docker_client: docker.DockerClient, unused_tcp_port_factory: Callable[[], int]
+) -> Iterator[str]:
     port = unused_tcp_port_factory()
     container = docker_client.containers.run(
         "redis:latest", detach=True, auto_remove=True, ports={"6379/tcp": port}
@@ -37,10 +41,8 @@ def redis_url(docker_client, unused_tcp_port_factory):
 
 
 @pytest_asyncio.fixture
-async def redis_client(redis_url):
-    from redis.asyncio import from_url
-
-    client = from_url(redis_url)
+async def redis_client(redis_url: str) -> "AsyncIterator[redis.asyncio.Redis[str]]":
+    client = redis.asyncio.from_url(redis_url)
     await client.initialize()
     yield client
     await client.close()

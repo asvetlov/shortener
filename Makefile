@@ -14,3 +14,10 @@ build:
 
 run: build
 	docker-compose up
+
+
+test:
+	pytest tests
+
+vtest:
+	pytest -vvv tests
