@@ -69,8 +69,9 @@ async def redirect(request: web.Request) -> web.Response:
     short = request.match_info["short"]
     url = await DB.get().redirect(short)
     if url is None:
+        logger.info("web.redirect.missed", short=short, url=url)
         raise web.HTTPNotFound()
-    logger.info("web.redirect", short=short, url=url)
+    logger.info("web.redirect.found", short=short, url=url)
     raise web.HTTPSeeOther(location=url)
 
 

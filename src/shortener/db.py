@@ -22,11 +22,14 @@ class Database:
     SYMBOLS = string.digits + string.ascii_letters
     SIZE = 5
 
-    def __init__(self, redis_url: str) -> None:
+    def __init__(self, redis_url: str, *, cluster: bool = False) -> None:
         logger.info("db.connect", url=redis_url)
         # plain Redis should be enough for the demo;
         # the battle deployent can use RedisCluster
-        self._redis = redis.from_url(redis_url)
+        if not cluster:
+            self._redis = redis.from_url(redis_url)
+        else:
+            self._redis = redis.RedisCluster.from_url(redis_url)  # type: ignore
 
     async def close(self) -> None:
         logger.info("db.close")

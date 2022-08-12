@@ -23,7 +23,7 @@
   <h2>Latest added short urls</h2>
   <ul>
   {% for item in latest %}
-    <li><a href="/{{ item.short }}">{{ item.short }} -> {{ item.href }} [{{ item.clicks }}]</a></li>
+    <li><a href="/{{ item.short }}">{{ item.short }} -> {{ item.url }} [{{ item.clicks }}]</a></li>
   {% endfor %}
   </ul>
 </body>
