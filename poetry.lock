@@ -308,6 +308,37 @@ toml = "*"
 virtualenv = ">=20.0.8"
 
 [[package]]
+name = "prometheus-async"
+version = "22.2.0"
+description = "Async helpers for prometheus_client."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+prometheus_client = ">=0.8.0"
+wrapt = "*"
+
+[package.extras]
+twisted = ["twisted"]
+tests = ["pytest-asyncio", "pytest", "coverage"]
+docs = ["twisted", "sphinxcontrib-asyncio", "sphinx", "sphinx-notfound-page", "myst-parser", "furo", "aiohttp"]
+dev = ["twisted", "sphinxcontrib-asyncio", "sphinx", "sphinx-notfound-page", "myst-parser", "furo", "aiohttp", "pytest-asyncio", "pytest", "coverage", "mypy", "cogapp", "tomli", "pytest-twisted", "pre-commit"]
+consul = ["aiohttp (>=3)"]
+aiohttp = ["aiohttp (>=3)"]
+
+[[package]]
+name = "prometheus-client"
+version = "0.14.1"
+description = "Python client for the Prometheus monitoring system."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
 name = "py"
 version = "1.11.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -554,7 +585,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "8d235f6c9ec5430140e1780ab2741d213b958c9475fe5d9fbe1193be3fc229bb"
+content-hash = "a6026c10805d0a1d548d145b40841f4ee56ab7fac821bcfc65ddcb1bd61b9e97"
 
 [metadata.files]
 aiohttp = [
@@ -908,6 +939,14 @@ pluggy = [
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
 pre-commit = []
+prometheus-async = [
+    {file = "prometheus-async-22.2.0.tar.gz", hash = "sha256:b0426370eb3b3bacd99afcf1fcc669c118cb67603cc951a6fe12434e9d4307f2"},
+    {file = "prometheus_async-22.2.0-py3-none-any.whl", hash = "sha256:5cbfa535561342b834c087c4f3f3be0a3cb8785a0b8748111c916f3d68bbc370"},
+]
+prometheus-client = [
+    {file = "prometheus_client-0.14.1-py3-none-any.whl", hash = "sha256:522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01"},
+    {file = "prometheus_client-0.14.1.tar.gz", hash = "sha256:5459c427624961076277fdc6dc50540e2bacb98eebde99886e59ec55ed92093a"},
+]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
